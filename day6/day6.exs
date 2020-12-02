@@ -40,9 +40,71 @@ defmodule Day6 do
       acc + fetch(child)
     end)
   end
+
+  def find_object({code, _, _}, code) do
+    []
+  end
+  def find_object({_, _, []}, code) do
+    nil
+  end
+  def find_object({parent, _, children}, code) do
+    case find(children, code) do
+      nil -> nil
+      result -> [parent | result]
+    end
+    # path = Enum.find(children, fn c ->
+    #   find_object(c, code)
+    # end)
+    # case path do
+    #   nil -> nil
+    #   c -> [parent | find_object(path, code)]
+    # end
+  end
+
+  def find([], _) do
+    nil
+  end
+  def find([child | children], code) do
+    case find_object(child, code) do
+      nil -> find(children, code)
+      result -> result
+    end
+  end
+
+  def evaluate_path([obj | san_tail], [obj | you_tail]) do
+    IO.inspect(obj)
+    evaluate_path(san_tail, you_tail)
+  end
+  def evaluate_path(san, you) do
+    length(san) + length(you)
+  end
 end
 
+
+path =
 File.read!("./signal.txt")
+# "COM)B
+# B)C
+# C)D
+# D)E
+# E)F
+# B)G
+# G)H
+# D)I
+# E)J
+# J)K
+# K)L
+# K)YOU
+# I)SAN"
 |> Day6.build_tree
-|> Day6.fetch
+
+path_to_san = path
+|> Day6.find_object("SAN")
+|> IO.inspect
+
+path_to_you = path
+|> Day6.find_object("YOU")
+|> IO.inspect
+
+Day6.evaluate_path(path_to_san, path_to_you)
 |> IO.inspect
